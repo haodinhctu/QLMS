@@ -1,6 +1,6 @@
 <template>
   <div v-if="staff" class="page">
-    <h4>Hiệu chỉnh NXB</h4>
+    <h4>Hiệu chỉnh Nhân Viên</h4>
     <StaffForm
       :staff="staff"
       @submit:staff="updateStaff"

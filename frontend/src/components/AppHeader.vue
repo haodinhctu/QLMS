@@ -9,7 +9,7 @@
       </div>
       <div class="nav-item">
         <router-link :to="{ name: 'borrow' }" class="nav-link">
-          Quản Lý <i class="fas fa-list"></i>
+          Quản Lý Mượn<i class="fas fa-list"></i>
         </router-link>
       </div>
       <template v-if="isStaff">

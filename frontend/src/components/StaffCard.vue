@@ -16,6 +16,11 @@
             <strong>Điện thoại:</strong>
             {{ staff.SoDienThoai }}
         </div>
+        <div class="mt-3">
+            <button class="btn btn-warning btn-sm" @click="goToEdit">
+                <i class="fas fa-edit"></i> Hiệu chỉnh
+            </button>
+        </div>
     </div>
 </template>
 
@@ -23,6 +28,11 @@
 export default {
     props: {
         staff: { type: Object, required: true },
+    },
+    methods: {
+        goToEdit() {
+            this.$router.push({ name: "staff.edit", params: { id: this.staff._id } });
+        },
     },
 };
 </script>

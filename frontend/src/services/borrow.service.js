@@ -30,4 +30,4 @@ class BorrowService {
     }
 }
 
-export default new PublisherService();
+export default new BorrowService();

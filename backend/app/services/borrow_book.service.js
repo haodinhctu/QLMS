@@ -32,7 +32,13 @@ class BorrowBookService {
         
         return result;
     }
-
+    async restoreBookQuantity(bookService, borrowId) {
+        // Tìm thông tin mượn sách
+        const borrow = await this.findById(borrowId);
+        if (borrow && borrow.MASACH) {
+            await bookService.increaseQuantity(borrow.MASACH);
+        }
+    }
     async find(filter) {
         const cursor = await this.BorrowBook.find(filter);
         return await cursor.toArray();
@@ -59,6 +65,13 @@ class BorrowBookService {
             {$set: update},
             {returnDocument: "after"}
         );
+        // Nếu trạng thái chuyển sang "Đã trả" thì phục hồi số lượng sách
+        if (update.TRANGTHAI === "Đã trả") {
+            // Import BookService
+            const BookService = require("./book.service");
+            const bookService = new BookService(this.BorrowBook.s.db.client);
+            await this.restoreBookQuantity(bookService, id);
+        }
         return result;
     }
 
