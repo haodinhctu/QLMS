@@ -1,0 +1,133 @@
+<template>
+  <Form @submit="submitReader" :validation-schema="readerFormSchema">
+    <div class="row" :class="{'row': !readerLocal._id, 'd-flex flex-column': readerLocal._id}">
+      <div v-if="!readerLocal._id" class="col-md-6">
+        <div class="mb-3">
+          <label for="TenDangNhap" class="form-label">Tài khoản</label>
+          <Field name="TenDangNhap" id="TenDangNhap" type="text" class="form-control" v-model="readerLocal.TenDangNhap" />
+          <ErrorMessage name="TenDangNhap" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="Password" class="form-label">Mật khẩu</label>
+          <Field name="Password" id="Password" type="password" class="form-control" v-model="readerLocal.Password" />
+          <ErrorMessage name="Password" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="Password2" class="form-label">Nhập lại mật khẩu</label>
+          <Field name="Password2" id="Password2" type="password" class="form-control"/>
+          <ErrorMessage name="Password2" class="error-feedback" />
+        </div>
+      </div>
+
+      <div :class="{'col-md-6': !readerLocal._id, 'col-md-12': readerLocal._id}">
+        <div class="mb-3">
+          <label for="HOLOT" class="form-label">Họ</label>
+          <Field name="HOLOT" id="HOLOT" type="text" class="form-control" v-model="readerLocal.HOLOT" />
+          <ErrorMessage name="HOLOT" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="TEN" class="form-label">Tên</label>
+          <Field name="TEN" id="TEN" type="text" class="form-control" v-model="readerLocal.TEN" />
+          <ErrorMessage name="TEN" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="NGAYSINH" class="form-label">Ngày sinh</label>
+          <Field name="NGAYSINH" id="NGAYSINH" type="date" class="form-control" v-model="readerLocal.NGAYSINH" />
+          <ErrorMessage name="NGAYSINH" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="PHAI" class="form-label">Giới tính</label>
+          <select id="PHAI" v-model="readerLocal.PHAI" class="form-select mb-2">
+            <option :value="1">Nam</option>
+            <option :value="0">Nữ</option>
+          </select>
+          <ErrorMessage name="PHAI" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="DIACHI" class="form-label">Địa chỉ</label>
+          <Field name="DIACHI" id="DIACHI" type="text" class="form-control" v-model="readerLocal.DIACHI" />
+          <ErrorMessage name="DIACHI" class="error-feedback" />
+        </div>
+
+        <div class="mb-3">
+          <label for="DIENTHOAI" class="form-label">Số điện thoại</label>
+          <Field name="DIENTHOAI" id="DIENTHOAI" type="text" class="form-control" v-model="readerLocal.DIENTHOAI" />
+          <ErrorMessage name="DIENTHOAI" class="error-feedback" />
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button class="btn btn-primary">Lưu</button>
+      <button v-if="readerLocal._id" type="button" class="ms-2 btn btn-danger" @click="deleteReader">Xóa</button>
+      <button type="button" class="ms-2 btn btn-secondary" @click="cancel">Thoát</button>
+    </div>
+  </Form>
+</template>
+
+<script>
+import * as yup from "yup";
+import { Form, Field, ErrorMessage } from "vee-validate";
+
+export default {
+  components: { Form, Field, ErrorMessage },
+  emits: ["submit:reader", "delete:reader"],
+  props: { reader: { type: Object, required: true } },
+
+  data() {
+    return {
+      readerLocal: { ...this.reader },
+      readerFormSchema: yup.object().shape({
+        TenDangNhap: yup.string().required("Vui lòng nhập tài khoản.").min(5, "Tài khoản phải ít nhất 5 ký tự."),
+        Password: yup.string().required("Vui lòng nhập mật khẩu.").min(8, "Mật khẩu ít nhất 8 ký tự."),
+        Password2: yup.string()
+          .oneOf([yup.ref("Password"), null], "Mật khẩu nhập lại không khớp.")
+          .required("Vui lòng nhập lại mật khẩu."),
+        HOLOT: yup.string().required("Vui lòng nhập họ.").min(2, "Họ phải ít nhất 2 ký tự.").max(50, "Họ tối đa 50 ký tự."),
+        TEN: yup.string().required("Vui lòng nhập tên.").min(2, "Tên phải ít nhất 2 ký tự.").max(50, "Tên tối đa 50 ký tự."),
+        NGAYSINH: yup
+          .date()
+          .required("Vui lòng nhập ngày sinh.")
+          .max(new Date(new Date().setFullYear(new Date().getFullYear() - 5)), "Độc giả phải ít nhất 5 tuổi."),
+        PHAI: yup.number().oneOf([0, 1], "Vui lòng chọn giới tính"),
+        DIACHI: yup.string().required("Vui lòng nhập địa chỉ.").min(2, "Địa chỉ phải ít nhất 2 ký tự.").max(50, "Địa chỉ tối đa 50 ký tự."),
+        DIENTHOAI: yup
+          .string()
+          .required("Vui lòng nhập số điện thoại.")
+          .matches(/^\d{10}$/, "Số điện thoại phải có đúng 10 chữ số."),
+      }),
+    };
+  },
+
+  methods: {
+    submitReader() {
+      this.readerLocal.PHAI = parseInt(this.readerLocal.PHAI, 10);
+      this.$emit("submit:reader", this.readerLocal);
+    },
+
+    deleteReader() {
+      this.$emit("delete:reader", this.readerLocal._id);
+    },
+
+    cancel() {
+      this.$router.back();
+    },
+  },
+};
+</script>
+
+<style scoped>
+@import "../assets/form.css";
+
+.error-feedback {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+</style>
